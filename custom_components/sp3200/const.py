@@ -1,6 +1,6 @@
 """Constants cho HS/MS/MSX inverter integration."""
 
-DOMAIN = "hs_ms_msx_inverter"
+DOMAIN = "sp3200"
 
 CONF_HOST = "host"
 CONF_PORT = "port"
