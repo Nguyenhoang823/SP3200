@@ -13,7 +13,7 @@ from .const import DOMAIN
 # Khoảng min/max lấy tương đối theo tài liệu (đơn vị 48V), điều chỉnh nếu
 # inverter của bạn là 12V/24V.
 NUMBER_DEFS = {
-    "battery_recharge_voltage": ("Điện Áp Chuyển Nguồn", "PBCV", 23.0, 27.0, 0.5),
+    "battery_recharge_voltage": ("Điện Áp Chuyển Nguồn", "PBCV", 22.0, 25.5, 0.5),
     "battery_redischarge_voltage": ("Điện Áp Xả Tải", "PBDV", 25.0, 28.0, 0.5),
     "battery_cutoff_voltage": ("Điện Áp Tắt Máy", "PSDV", 22.0, 24.0, 0.1),
     "battery_cv_voltage": ("Điện Áp Đầy Pin", "PCVV", 27.0, 29.0, 0.1),
