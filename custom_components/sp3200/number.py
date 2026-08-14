@@ -14,10 +14,10 @@ from .const import DOMAIN
 # inverter của bạn là 12V/24V.
 NUMBER_DEFS = {
     "battery_recharge_voltage": ("Điện Áp Chuyển Nguồn", "PBCV", 22.0, 25.5, 0.5),
-    "battery_redischarge_voltage": ("Điện Áp Xả Tải", "PBDV", 25.0, 28.0, 0.5),
-    "battery_cutoff_voltage": ("Điện Áp Tắt Máy", "PSDV", 22.0, 24.0, 0.1),
-    "battery_cv_voltage": ("Điện Áp Đầy Pin", "PCVV", 27.0, 29.0, 0.1),
-    "battery_float_voltage": ("Điện Áp Sạc Thả Nổi", "PBFT", 27.5, 28.5, 0.1),
+    "battery_redischarge_voltage": ("Điện Áp Xả Tải", "PBDV", 24.0, 29.0, 0.5),
+    "battery_cutoff_voltage": ("Điện Áp Tắt Máy", "PSDV", 20.0, 24.0, 0.1),
+    "battery_cv_voltage": ("Điện Áp Đầy Pin", "PCVV", 24.0, 29.2, 0.1),
+    "battery_float_voltage": ("Điện Áp Sạc Thả Nổi", "PBFT", 24.0, 29.2, 0.1),
 }
 
 
