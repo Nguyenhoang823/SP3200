@@ -11,15 +11,15 @@ from .const import DOMAIN
 
 # key cờ (theo tài liệu QFLAG/PE/PD) -> tên hiển thị
 FLAG_DEFS = {
-    "a": "Silence Buzzer",
-    "b": "Overload Bypass",
-    "j": "Power Saving",
-    "k": "LCD Escape To Default After 1min",
-    "u": "Overload Restart",
-    "v": "Over Temperature Restart",
-    "x": "Backlight On",
-    "y": "Alarm On Primary Source Interrupt",
-    "z": "Fault Code Record",
+    "a": "Âm Bíp",
+    "b": "Bypass Khi Quá Tải",
+    "j": "Tiết Kiệm Điện",
+    "k": "Quay Về Màn Hình Chính",
+    "u": "Khởi Động Lại Khi Quá Tải",
+    "v": "Khởi Động Lại Khi Quá Nhiệt",
+    "x": "Đèn Nền",
+    "y": "Âm Báo Khi Mất Lưới",
+    "z": "Ghi Lại Lỗi",
 }
 
 
