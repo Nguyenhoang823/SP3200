@@ -58,6 +58,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     entities.append(InverterVoltageSelect(coordinator, entry))
 
+    # Điện áp pin: dùng SELECT (danh sách xổ xuống), không còn ô nhập số.
+    entities.extend(
+        InverterBatteryVoltageSelect(
+            coordinator, entry, key, name, prefix, vmin, vmax, step
+        )
+        for key, (name, prefix, vmin, vmax, step) in BATTERY_VOLTAGE_DEFS.items()
+    )
+
     async_add_entities(entities)
 
 
@@ -103,6 +111,82 @@ class InverterCurrentSelect(CoordinatorEntity, SelectEntity):
             return
         value_str = f"{amps:0{self._digits}d}"
         ok = await self.coordinator.client.send_set_command(f"{self._cmd_prefix}{value_str}")
+        if ok:
+            self._optimistic_override = option
+            self.async_write_ha_state()
+            await self.coordinator.async_request_refresh()
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(identifiers={(DOMAIN, self._entry.entry_id)})
+
+
+# Điện áp pin giữ nguyên đúng step của number.py cũ:
+# PBCV/PBDV = 0.5V; PSDV/PCVV/PBFT = 0.1V.
+BATTERY_VOLTAGE_DEFS = {
+    "battery_recharge_voltage": ("Điện Áp Chuyển Nguồn", "PBCV", 22.0, 25.5, 0.5),
+    "battery_redischarge_voltage": ("Điện Áp Xả Tải", "PBDV", 24.0, 29.0, 0.5),
+    "battery_cutoff_voltage": ("Điện Áp Tắt Máy", "PSDV", 20.0, 24.0, 0.1),
+    "battery_cv_voltage": ("Điện Áp Đầy Pin", "PCVV", 24.0, 29.2, 0.1),
+    "battery_float_voltage": ("Điện Áp Sạc Thả Nổi", "PBFT", 24.0, 29.2, 0.1),
+}
+
+BATTERY_VOLTAGE_DATA_KEY = {
+    "battery_recharge_voltage": "battery_recharge_voltage",
+    "battery_redischarge_voltage": "battery_redischarge_voltage",
+    "battery_cutoff_voltage": "battery_under_voltage",
+    "battery_cv_voltage": "battery_cv_voltage",
+    "battery_float_voltage": "battery_float_voltage",
+}
+
+
+def _voltage_options(vmin: float, vmax: float, step: float) -> list[str]:
+    count = round((vmax - vmin) / step)
+    return [f"{vmin + i * step:.1f}V" for i in range(count + 1)]
+
+
+class InverterBatteryVoltageSelect(CoordinatorEntity, SelectEntity):
+    """Điện áp pin dạng danh sách xổ xuống."""
+
+    def __init__(
+        self, coordinator, entry, key: str, name: str,
+        cmd_prefix: str, vmin: float, vmax: float, step: float
+    ):
+        super().__init__(coordinator)
+        self._entry = entry
+        self._key = key
+        self._cmd_prefix = cmd_prefix
+        self._data_key = BATTERY_VOLTAGE_DATA_KEY[key]
+        self._attr_name = f"Sumry Inverter {name}"
+        self._attr_unique_id = f"{entry.entry_id}_select_{key}"
+        self._attr_options = _voltage_options(vmin, vmax, step)
+        self._optimistic_override: str | None = None
+
+    @property
+    def current_option(self):
+        value = self.coordinator.data.get(self._data_key)
+        if value is not None:
+            try:
+                value = float(value)
+                # Hiển thị theo đúng một chữ số thập phân.
+                option = f"{value:.1f}V"
+                if option in self._attr_options:
+                    self._optimistic_override = None
+                    return option
+            except (TypeError, ValueError):
+                pass
+        return self._optimistic_override
+
+    async def async_select_option(self, option: str) -> None:
+        try:
+            value = float(option.rstrip("V"))
+        except ValueError:
+            return
+
+        value_str = f"{value:04.1f}"
+        ok = await self.coordinator.client.send_set_command(
+            f"{self._cmd_prefix}{value_str}"
+        )
         if ok:
             self._optimistic_override = option
             self.async_write_ha_state()
